@@ -1,13 +1,11 @@
 package com.ashin.vehiclerental;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.ashin.vehiclerental.model.Customer;
-import com.ashin.vehiclerental.util.DatabaseConnection;
+import com.ashin.vehiclerental.repository.CustomerRepository;
+import com.ashin.vehiclerental.service.CustomerService;
 
 public class Main 
 {
@@ -15,62 +13,27 @@ public class Main
        public static void main(String[] args) 
        {
 
-            // String checkDbQuery = "Show Databases";
+           CustomerRepository customerRepository = new CustomerRepository();
 
-            String checkCustomerQuery = "SELECT * FROM customers";
-
-            // String insertQuery = "INSERT INTO customers(name,phone,email) VALUES(?,?,?)";
-            try
+           CustomerService customerService = new CustomerService();
+           
+           
+        //    Customer customer = new Customer("Ashin", "ash@gmail.com", "1234567890");
+           
+        //    customerService.registerCustomer(customer);
+           
+              List<Customer> customers = new ArrayList<>();
+   
+              customers = customerRepository.getAllCustomers();
+   
+              for (Customer customer2 : customers) 
             {
-                DatabaseConnection databaseConnection = new DatabaseConnection();
+               System.out.println(customer2);
+              }
+        
+
+       
 
 
-                try( Connection connection = databaseConnection.getConnection();
-                    PreparedStatement preparedStatement = connection.prepareStatement(checkCustomerQuery);
-                    ResultSet resultSet = preparedStatement.executeQuery();
-                       )
-                {
-                //    preparedStatement.setString(1, "Ashin");
-                //    preparedStatement.setString(2, "12345678");
-                //    preparedStatement.setString(3, "ash@gmail.com");
-
-                //    int row = preparedStatement.executeUpdate();
-
-                //    System.out.println(row + " Affected ");
-
-
-                
-                while (resultSet.next()) 
-                    {
-                            int id = resultSet.getInt("id");
-            
-                            String name = resultSet.getString("name");
-            
-                            String email = resultSet.getString("email");
-            
-                            String phone = resultSet.getString("phone");
-            
-                            Customer customer = new Customer(id,name, email, phone);
-                            
-                            System.out.println(customer.getId());
-                            System.out.println(customer.getName());
-                            System.out.println(customer.getEmail());
-                            System.out.println(customer.getPhone());
-                        }
-
-
-
-                }
-                                    
-                
-            }
-            catch(IOException e)
-            {
-                e.printStackTrace();
-            }
-            catch(SQLException e)
-            {
-                e.printStackTrace();
-            }
        }
 }

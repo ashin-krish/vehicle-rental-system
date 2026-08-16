@@ -1,3 +1,6 @@
-com\ashin\vehiclerental\Main.class
-com\ashin\vehiclerental\model\Customer.class
+com\ashin\vehiclerental\service\CustomerService.class
 com\ashin\vehiclerental\util\DatabaseConnection.class
+com\ashin\vehiclerental\Main.class
+com\ashin\vehiclerental\exception\DataAccessException.class
+com\ashin\vehiclerental\model\Customer.class
+com\ashin\vehiclerental\repository\CustomerRepository.class
