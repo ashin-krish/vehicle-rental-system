@@ -162,4 +162,34 @@ public class VehicleRepository
             }
        }
 
+       public int updateVehicleStatus(String registrationNumber,Vehicle.VehicleStatus vehicleStatus)
+       {
+            String updateVehicleStatusQuery = " UPDATE vehicles set vehicle_status = ? WHERE  registration_number = ? ";
+
+            try 
+            {
+                    DatabaseConnection databaseConnection = new DatabaseConnection();
+                    
+                    try (Connection connection = databaseConnection.getConnection();
+                            PreparedStatement preparedStatement = connection.prepareStatement(updateVehicleStatusQuery)) 
+                    {
+                            
+                        String enumToStringstatus = vehicleStatus.name();
+
+                        preparedStatement.setString(1, enumToStringstatus);
+
+                        preparedStatement.setString(2, registrationNumber);
+
+                       int rowsAffected = preparedStatement.executeUpdate();
+
+                       return rowsAffected;
+                    } 
+
+
+            } catch (SQLException | IOException e) 
+            {
+                throw new DataAccessException(" Failed to Update The Status " ,e);
+            }
+       }
+
 }

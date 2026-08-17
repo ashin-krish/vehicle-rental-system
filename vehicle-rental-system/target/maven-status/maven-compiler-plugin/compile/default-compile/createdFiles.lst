@@ -6,4 +6,5 @@ com\ashin\vehiclerental\model\Vehicle$VehicleStatus.class
 com\ashin\vehiclerental\exception\DataAccessException.class
 com\ashin\vehiclerental\model\Customer.class
 com\ashin\vehiclerental\repository\CustomerRepository.class
+com\ashin\vehiclerental\service\VehicleService.class
 com\ashin\vehiclerental\model\Vehicle.class
