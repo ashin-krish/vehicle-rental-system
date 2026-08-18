@@ -32,8 +32,14 @@ public class CustomerService
 
             customerRepository.saveCustomer(customer);
 
+            
+            
+            
+        }
 
-
-    }
+        public boolean existById(int customerId)
+        {
+            return customerRepository.existsById(customerId);
+        }
 }
  

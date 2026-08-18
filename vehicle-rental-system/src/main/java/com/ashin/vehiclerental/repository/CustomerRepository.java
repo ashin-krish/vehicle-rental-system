@@ -158,4 +158,45 @@ public class CustomerRepository {
 
     }
 
+    public boolean existsById(int customerId)
+    {
+        String idExistQuery = """
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM customers
+                    WHERE id = ?
+                ) AS is_present
+                """;
+
+            try {
+                    DatabaseConnection databaseConnection = new DatabaseConnection();
+
+                try (Connection connection = databaseConnection.getConnection();
+                        PreparedStatement preparedStatement = connection.prepareStatement(idExistQuery)) 
+                {
+                    preparedStatement.setInt(1, customerId);
+                    
+                    try (ResultSet resultSet = preparedStatement.executeQuery()) 
+                    {
+
+                            if(resultSet.next())
+                            {
+
+                                int status = resultSet.getInt("is_present");
+        
+                               return status==1;
+                            }
+                    } 
+
+                    throw new DataAccessException(" No result returned while checking customer Id ");
+                } 
+                
+            } catch (SQLException | IOException e) 
+            {
+                    throw new DataAccessException(" Failed to Check Id ",e);    
+            }
+
+
+    }
+
 }

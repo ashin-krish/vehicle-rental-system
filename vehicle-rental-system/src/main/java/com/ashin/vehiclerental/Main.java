@@ -5,6 +5,7 @@ package com.ashin.vehiclerental;
 
 import com.ashin.vehiclerental.model.Vehicle;
 import com.ashin.vehiclerental.model.Vehicle.VehicleStatus;
+import com.ashin.vehiclerental.service.RentalService;
 // import com.ashin.vehiclerental.model.Vehicle.VehicleStatus;
 // import com.ashin.vehiclerental.repository.VehicleRepository;
 import com.ashin.vehiclerental.service.VehicleService;
@@ -36,7 +37,15 @@ public class Main
 
           //   vehicleService.registerVehicle(vehicle);
 
-          vehicleService.updateVehicleStatus("KL18UIO", VehicleStatus.RENTED);
+          // vehicleService.updateVehicleStatus("KL18UIO", VehicleStatus.RENTED);
+
+          RentalService rentalService = new RentalService();
+
+          // rentalService.rentVehicle(1, 1);
+
+          rentalService.returnRental(1, 1);
+
+
 
 
 

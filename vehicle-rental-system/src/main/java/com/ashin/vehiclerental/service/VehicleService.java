@@ -1,10 +1,8 @@
 package com.ashin.vehiclerental.service;
-
 import com.ashin.vehiclerental.repository.VehicleRepository;
-
 import com.ashin.vehiclerental.model.Vehicle;
-
 import java.util.List;
+
 
 public class VehicleService {
 
@@ -25,20 +23,28 @@ public class VehicleService {
         vehicleRepository.saveVehicle(vehicle);
     }
 
-    public boolean isVehicleAvailable(String registrationNumber)
+    public boolean isVehicleAvailable(int vehicleId)
     {
-        return vehicleRepository.isVehicleAvailable(registrationNumber);   
+        return vehicleRepository.isVehicleAvailable(vehicleId);   
     }
 
-    public void updateVehicleStatus(String registrationNumber,Vehicle.VehicleStatus vehicleStatus)
+    public void updateVehicleStatus(int vehicleId,Vehicle.VehicleStatus vehicleStatus)
     {
-        int rowsAffected = vehicleRepository.updateVehicleStatus(registrationNumber, vehicleStatus);
+        int rowsAffected = vehicleRepository.updateVehicleStatus(vehicleId, vehicleStatus);
 
         if(rowsAffected == 0)
         {
             throw new IllegalArgumentException(" Vehicle does not exist ");
         }
     }
+
+    public boolean existById(int vehicleId)
+    {
+        return vehicleRepository.existById(vehicleId);
+    }
+
+
+      
 
     
 

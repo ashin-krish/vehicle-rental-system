@@ -126,14 +126,16 @@ public class VehicleRepository
 }
 
 
-       public boolean isVehicleAvailable(String registrationNumber)
+       public boolean isVehicleAvailable(int vehicleId)
        {
-            String vehicleAvailabilitySearchQuery="SELECT EXISTS (\r\n" + //
-                                "    SELECT 1\r\n" + //
-                                "    FROM vehicles\r\n" + //
-                                "    WHERE registration_number = ?\r\n" + //
-                                "    AND  vehicle_status = 'AVAILABLE'\r\n" + //
-                                ") AS is_present";
+            String vehicleAvailabilitySearchQuery="""
+                                            SELECT EXISTS (
+                            SELECT 1
+                            FROM vehicles
+                            WHERE id = ?
+                            AND vehicle_status = 'AVAILABLE'
+                        ) AS is_present;
+                    """;
 
             try 
             {
@@ -142,7 +144,7 @@ public class VehicleRepository
                 try (Connection connection = databaseConnection.getConnection();
                         PreparedStatement preparedStatement = connection.prepareStatement(vehicleAvailabilitySearchQuery)) 
                 {
-                        preparedStatement.setString(1, registrationNumber);
+                        preparedStatement.setInt(1, vehicleId);
 
                         try (ResultSet resultSet = preparedStatement.executeQuery()) 
                         {
@@ -162,9 +164,9 @@ public class VehicleRepository
             }
        }
 
-       public int updateVehicleStatus(String registrationNumber,Vehicle.VehicleStatus vehicleStatus)
+       public int updateVehicleStatus(int vehicleId,Vehicle.VehicleStatus vehicleStatus)
        {
-            String updateVehicleStatusQuery = " UPDATE vehicles set vehicle_status = ? WHERE  registration_number = ? ";
+            String updateVehicleStatusQuery = " UPDATE vehicles set vehicle_status = ? WHERE  id = ? ";
 
             try 
             {
@@ -178,7 +180,7 @@ public class VehicleRepository
 
                         preparedStatement.setString(1, enumToStringstatus);
 
-                        preparedStatement.setString(2, registrationNumber);
+                        preparedStatement.setInt(2, vehicleId);
 
                        int rowsAffected = preparedStatement.executeUpdate();
 
@@ -191,5 +193,45 @@ public class VehicleRepository
                 throw new DataAccessException(" Failed to Update The Status " ,e);
             }
        }
+
+       public boolean existById(int id)
+       {
+            String vehicleIdExistQuery = """
+                    SELECT EXISTS (
+                    SELECT 1
+                    FROM vehicles
+                    WHERE id = ?
+                ) AS is_present;
+                    """;
+
+                try {
+                    DatabaseConnection databaseConnection = new DatabaseConnection();
+
+                    try (Connection connection = databaseConnection.getConnection();
+                            PreparedStatement preparedStatement = connection.prepareStatement(vehicleIdExistQuery)) 
+                    {
+                            preparedStatement.setInt(1, id);
+                            
+                        try (ResultSet resultSet = preparedStatement.executeQuery()) 
+                        {
+                            
+                            if(resultSet.next())
+                                {
+                                    int status = resultSet.getInt("is_present");
+
+                                    return status == 1; 
+                                }
+
+                        
+                                throw new DataAccessException(" No result returned while checking Vehicle Id  ");
+
+                        } 
+                    } 
+                } catch (SQLException | IOException e) 
+                {
+                    throw new DataAccessException(" Failed to check The vehicle Id ",e);    
+                }
+       }
+       
 
 }
