@@ -1,14 +1,18 @@
 package com.ashin.vehiclerental.service;
 import com.ashin.vehiclerental.repository.VehicleRepository;
 import com.ashin.vehiclerental.model.Vehicle;
-
 import java.sql.Connection;
 import java.util.List;
 
 
 public class VehicleService {
 
-    private VehicleRepository vehicleRepository = new VehicleRepository();
+    private VehicleRepository vehicleRepository;
+
+    public VehicleService(VehicleRepository vehicleRepository)
+    {
+        this.vehicleRepository=vehicleRepository;
+    }
 
     public List<Vehicle> getAllVehicles() {
         return vehicleRepository.getAllVehicles();
@@ -59,9 +63,12 @@ public class VehicleService {
         return vehicleRepository.existById(vehicleId);
     }
 
+    public boolean existsByRegistrationNumber(String registerNumber)
+    {
+        return vehicleRepository.existsByRegistrationNumber(registerNumber);
+    }
 
-      
+}    
 
     
 
-}
