@@ -12,191 +12,160 @@ import com.ashin.vehiclerental.util.DatabaseConnection;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VehicleRepository 
-{
-    public void saveVehicle(Vehicle vehicle)
-    {
+public class VehicleRepository {
+    public void saveVehicle(Vehicle vehicle) {
 
-            String insertQuery = "INSERT INTO vehicles(registration_number, brand, model, type, price_per_day, vehicle_status) VALUES(?,?,?,?,?,?)";
-            try {
-                
-                DatabaseConnection databaseConnection = new DatabaseConnection();
+        String insertQuery = "INSERT INTO vehicles(registration_number, brand, model, type, price_per_day, vehicle_status) VALUES(?,?,?,?,?,?)";
+        try {
 
-                try(Connection connection = databaseConnection.getConnection();
-                    PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) 
-                {
-                   preparedStatement.setString(1, vehicle.getRegistrationNumber());
-                   preparedStatement.setString(2, vehicle.getBrand());
-                   preparedStatement.setString(3, vehicle.getModel());
-                   preparedStatement.setString(4, vehicle.getType());
-                   preparedStatement.setInt(5, vehicle.getPricePerDay());
-                   preparedStatement.setString(6, vehicle.getVehicleStatus().name());
+            DatabaseConnection databaseConnection = new DatabaseConnection();
 
-                   preparedStatement.executeUpdate();
-                } 
-            } catch (SQLException | IOException e) 
-            {
-                throw new DataAccessException("Failed to Save vehicle", e);
+            try (Connection connection = databaseConnection.getConnection();
+                    PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
+                preparedStatement.setString(1, vehicle.getRegistrationNumber());
+                preparedStatement.setString(2, vehicle.getBrand());
+                preparedStatement.setString(3, vehicle.getModel());
+                preparedStatement.setString(4, vehicle.getType());
+                preparedStatement.setInt(5, vehicle.getPricePerDay());
+                preparedStatement.setString(6, vehicle.getVehicleStatus().name());
+
+                preparedStatement.executeUpdate();
             }
+        } catch (SQLException | IOException e) {
+            throw new DataAccessException("Failed to Save vehicle", e);
+        }
 
     }
 
-    public List<Vehicle> getAllVehicles()
-    {
+    public List<Vehicle> getAllVehicles() {
         List<Vehicle> vehicles = new ArrayList<>();
 
         String selectQuery = "SELECT * FROM vehicles";
-        
 
-        try 
-        {
-                DatabaseConnection databaseConnection = new DatabaseConnection();
+        try {
+            DatabaseConnection databaseConnection = new DatabaseConnection();
 
-                try (Connection connection =databaseConnection.getConnection();
-                        PreparedStatement preparedStatement = connection.prepareStatement(selectQuery);
-                        ResultSet resultSet = preparedStatement.executeQuery()) 
-                {
-                    while (resultSet.next()) 
-                    {
-                           int id = resultSet.getInt("id");
-                            String registrationNumber = resultSet.getString("registration_number");
-                            String brand = resultSet.getString("brand");
-                            String model = resultSet.getString("model");
-                            String type = resultSet.getString("type");
-                            int pricePerDay = resultSet.getInt("price_per_day");
-                            String status = resultSet.getString("vehicle_status");
+            try (Connection connection = databaseConnection.getConnection();
+                    PreparedStatement preparedStatement = connection.prepareStatement(selectQuery);
+                    ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    int id = resultSet.getInt("id");
+                    String registrationNumber = resultSet.getString("registration_number");
+                    String brand = resultSet.getString("brand");
+                    String model = resultSet.getString("model");
+                    String type = resultSet.getString("type");
+                    int pricePerDay = resultSet.getInt("price_per_day");
+                    String status = resultSet.getString("vehicle_status");
 
-                            Vehicle.VehicleStatus vehicleStatus = Vehicle.VehicleStatus.valueOf(status);
+                    Vehicle.VehicleStatus vehicleStatus = Vehicle.VehicleStatus.valueOf(status);
 
-                            Vehicle vehicle = new Vehicle(id,registrationNumber, brand, model, type, pricePerDay, vehicleStatus);
+                    Vehicle vehicle = new Vehicle(id, registrationNumber, brand, model, type, pricePerDay,
+                            vehicleStatus);
 
-                            vehicles.add(vehicle);
-                    }  
+                    vehicles.add(vehicle);
                 }
-    
-       
-        } 
-        catch (SQLException | IOException e) 
-        {
-            throw new DataAccessException("Failed to Load Vehicle",e);
+            }
+
+        } catch (SQLException | IOException e) {
+            throw new DataAccessException("Failed to Load Vehicle", e);
         }
 
         return vehicles;
 
-
     }
 
-
-
-    public boolean existsByRegistrationNumber(String registrationNumber)
-    {
+    public boolean existsByRegistrationNumber(String registrationNumber) {
         String existsByRegistrationNumberQuery = "SELECT EXISTS (\r\n" + //
-                        "    SELECT 1\r\n" + //
-                        "    FROM vehicles\r\n" + //
-                        "    WHERE registration_number = ?\r\n" + //
-                        ") AS is_present";
+                "    SELECT 1\r\n" + //
+                "    FROM vehicles\r\n" + //
+                "    WHERE registration_number = ?\r\n" + //
+                ") AS is_present";
 
         try {
-            
-                DatabaseConnection databaseConnection = new DatabaseConnection();
 
-                try (Connection connection = databaseConnection.getConnection();
-                        PreparedStatement preparedStatement = connection.prepareStatement(existsByRegistrationNumberQuery)) 
-                {
+            DatabaseConnection databaseConnection = new DatabaseConnection();
 
-                        preparedStatement.setString(1, registrationNumber);
-                        try (ResultSet resultSet = preparedStatement.executeQuery()) 
-                        {
-                                if(resultSet.next())
-                                {
-                                    int status = resultSet.getInt("is_present");
+            try (Connection connection = databaseConnection.getConnection();
+                    PreparedStatement preparedStatement = connection
+                            .prepareStatement(existsByRegistrationNumberQuery)) {
 
-                                    return status == 1;
-                                }
-                                throw new DataAccessException(" No result returned while checking Vehicle Registration Number");
-                            } 
+                preparedStatement.setString(1, registrationNumber);
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        int status = resultSet.getInt("is_present");
 
-                } 
+                        return status == 1;
+                    }
+                    throw new DataAccessException(" No result returned while checking Vehicle Registration Number");
+                }
 
-        } catch (SQLException | IOException e) 
-    {
+            }
+
+        } catch (SQLException | IOException e) {
             throw new DataAccessException(" Failed to check Registration Number ", e);
+        }
+
     }
-         
-}
 
+    public boolean isVehicleAvailable(int vehicleId) {
+        String vehicleAvailabilitySearchQuery = """
+                                        SELECT EXISTS (
+                        SELECT 1
+                        FROM vehicles
+                        WHERE id = ?
+                        AND vehicle_status = 'AVAILABLE'
+                    ) AS is_present;
+                """;
 
-       public boolean isVehicleAvailable(int vehicleId)
-       {
-            String vehicleAvailabilitySearchQuery="""
-                                            SELECT EXISTS (
-                            SELECT 1
-                            FROM vehicles
-                            WHERE id = ?
-                            AND vehicle_status = 'AVAILABLE'
-                        ) AS is_present;
-                    """;
+        try {
+            DatabaseConnection databaseConnection = new DatabaseConnection();
 
-            try 
-            {
-                DatabaseConnection databaseConnection = new DatabaseConnection();
+            try (Connection connection = databaseConnection.getConnection();
+                    PreparedStatement preparedStatement = connection.prepareStatement(vehicleAvailabilitySearchQuery)) {
+                preparedStatement.setInt(1, vehicleId);
 
-                try (Connection connection = databaseConnection.getConnection();
-                        PreparedStatement preparedStatement = connection.prepareStatement(vehicleAvailabilitySearchQuery)) 
-                {
-                        preparedStatement.setInt(1, vehicleId);
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        int status = resultSet.getInt("is_present");
+                        return status == 1;
+                    }
 
-                        try (ResultSet resultSet = preparedStatement.executeQuery()) 
-                        {
-                            if(resultSet.next())
-                            {
-                                int status = resultSet.getInt("is_present");
-                                return status == 1;
-                            }
+                    throw new DataAccessException("No result returned while checking Vehicle Registration Number");
+                }
 
-                            throw new DataAccessException("No result returned while checking Vehicle Registration Number");
-                        } 
-
-                } 
-            } catch (SQLException | IOException e) 
-            {
-                throw new DataAccessException(" Failed to Check The Availability of the Vechile " , e);
             }
-       }
+        } catch (SQLException | IOException e) {
+            throw new DataAccessException(" Failed to Check The Availability of the Vechile ", e);
+        }
+    }
 
-       public int updateVehicleStatus(int vehicleId,Vehicle.VehicleStatus vehicleStatus)
-       {
-            String updateVehicleStatusQuery = " UPDATE vehicles set vehicle_status = ? WHERE  id = ? ";
+    public int updateVehicleStatus(int vehicleId, Vehicle.VehicleStatus vehicleStatus) {
+        String updateVehicleStatusQuery = " UPDATE vehicles set vehicle_status = ? WHERE  id = ? ";
 
-            try 
-            {
-                    DatabaseConnection databaseConnection = new DatabaseConnection();
-                    
-                    try (Connection connection = databaseConnection.getConnection();
-                            PreparedStatement preparedStatement = connection.prepareStatement(updateVehicleStatusQuery)) 
-                    {
-                            
-                        String enumToStringstatus = vehicleStatus.name();
+        try {
+            DatabaseConnection databaseConnection = new DatabaseConnection();
 
-                        preparedStatement.setString(1, enumToStringstatus);
+            try (Connection connection = databaseConnection.getConnection();
+                    PreparedStatement preparedStatement = connection.prepareStatement(updateVehicleStatusQuery)) {
 
-                        preparedStatement.setInt(2, vehicleId);
+                String enumToStringstatus = vehicleStatus.name();
 
-                       int rowsAffected = preparedStatement.executeUpdate();
+                preparedStatement.setString(1, enumToStringstatus);
 
-                       return rowsAffected;
-                    } 
+                preparedStatement.setInt(2, vehicleId);
 
+                int rowsAffected = preparedStatement.executeUpdate();
 
-            } catch (SQLException | IOException e) 
-            {
-                throw new DataAccessException(" Failed to Update The Status " ,e);
+                return rowsAffected;
             }
-       }
 
-       public boolean existById(int id)
-       {
-            String vehicleIdExistQuery = """
+        } catch (SQLException | IOException e) {
+            throw new DataAccessException(" Failed to Update The Status ", e);
+        }
+    }
+
+    public boolean existById(int id) {
+        String vehicleIdExistQuery = """
                     SELECT EXISTS (
                     SELECT 1
                     FROM vehicles
@@ -204,34 +173,52 @@ public class VehicleRepository
                 ) AS is_present;
                     """;
 
-                try {
-                    DatabaseConnection databaseConnection = new DatabaseConnection();
+        try {
+            DatabaseConnection databaseConnection = new DatabaseConnection();
 
-                    try (Connection connection = databaseConnection.getConnection();
-                            PreparedStatement preparedStatement = connection.prepareStatement(vehicleIdExistQuery)) 
-                    {
-                            preparedStatement.setInt(1, id);
-                            
-                        try (ResultSet resultSet = preparedStatement.executeQuery()) 
-                        {
-                            
-                            if(resultSet.next())
-                                {
-                                    int status = resultSet.getInt("is_present");
+            try (Connection connection = databaseConnection.getConnection();
+                    PreparedStatement preparedStatement = connection.prepareStatement(vehicleIdExistQuery)) {
+                preparedStatement.setInt(1, id);
 
-                                    return status == 1; 
-                                }
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
 
-                        
-                                throw new DataAccessException(" No result returned while checking Vehicle Id  ");
+                    if (resultSet.next()) {
+                        int status = resultSet.getInt("is_present");
 
-                        } 
-                    } 
-                } catch (SQLException | IOException e) 
-                {
-                    throw new DataAccessException(" Failed to check The vehicle Id ",e);    
+                        return status == 1;
+                    }
+
+                    throw new DataAccessException(" No result returned while checking Vehicle Id  ");
+
                 }
-       }
-       
+            }
+        } catch (SQLException | IOException e) {
+            throw new DataAccessException(" Failed to check The vehicle Id ", e);
+        }
+    }
+
+    public int updateVehicleStatus(
+            int vehicleId,
+            Vehicle.VehicleStatus vehicleStatus,
+            Connection connection) {
+        String updateQuery = """
+                UPDATE vehicles
+                SET vehicle_status = ?
+                WHERE id = ?
+                """;
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
+            preparedStatement.setString(
+                    1,
+                    vehicleStatus.name());
+
+            preparedStatement.setInt(2, vehicleId);
+
+            return preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException(
+                    "Failed to Update Vehicle Status", e);
+        }
+    }
 
 }

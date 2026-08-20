@@ -1,63 +1,152 @@
-package com.ashin.vehiclerental.service;
+// package com.ashin.vehiclerental.service;
 
-import java.time.LocalDate;
+// import java.io.IOException;
+// import java.sql.Connection;
+// import java.sql.SQLException;
+// import java.time.LocalDate;
 
-import com.ashin.vehiclerental.model.Rental;
-import com.ashin.vehiclerental.model.Vehicle;
-import com.ashin.vehiclerental.repository.RentalRepository;
+// import com.ashin.vehiclerental.exception.DataAccessException;
+// import com.ashin.vehiclerental.model.Rental;
+// import com.ashin.vehiclerental.model.Vehicle;
+// import com.ashin.vehiclerental.repository.RentalRepository;
+// import com.ashin.vehiclerental.util.DatabaseConnection;
 
-public class RentalService 
-{
+// public class RentalService {
 
-    VehicleService vehicleService = new VehicleService();
-    CustomerService customerService = new CustomerService();
+//     VehicleService vehicleService = new VehicleService();
+//     CustomerService customerService = new CustomerService();
 
-    RentalRepository rentalRepository = new RentalRepository();
+//     RentalRepository rentalRepository = new RentalRepository();
+
+//     public void rentVehicle(int customerId, int vehicleId) {
+//         if (!customerService.existById(customerId)) {
+//             throw new IllegalArgumentException(" Customer Not Exist ");
+//         }
+
+//         if (!vehicleService.existById(vehicleId)) {
+//             throw new IllegalArgumentException(" Vehicle Not Exist ");
+//         }
+
+//         if (!vehicleService.isVehicleAvailable(vehicleId)) {
+//             throw new IllegalArgumentException(" Vehicel Not Available ");
+//         }
+
+//         LocalDate currentDate = LocalDate.now();
+//         LocalDate returnDate = null;
+
+//         Connection connection = null;
+
+//         Rental rental = new Rental(customerId, vehicleId, currentDate, returnDate);
+
+//         try {
+//             DatabaseConnection databaseConnection = new DatabaseConnection();
+//             connection = databaseConnection.getConnection();
+
+//             connection.setAutoCommit(false);
+
+//             int rentaRows = rentalRepository.saveRental(rental, connection);
+
+//             int vehicleRows = vehicleService.updateVehicleStatus(vehicleId, Vehicle.VehicleStatus.RENTED, connection);
+
+//             if (rentaRows != 1 || vehicleRows != 1) {
+//                 connection.rollback();
+
+//                 throw new DataAccessException(" Rental Transcation Failed ");
+//             }
+
+//             connection.commit();
+
+//         } catch (SQLException | IOException e) {
+//             if (connection != null) {
+//                 try {
+
+//                     connection.rollback();
+
+//                 } catch (SQLException rollBackException) {
+//                     e.addSuppressed(rollBackException);
+//                 }
+//             }
+
+//             throw new DataAccessException(
+//                     "Failed to Rent Vehicle", e);
+//         }
+
+//         finally {
+//             if (connection != null) {
+//                 try {
+//                     connection.close();
+//                 } catch (SQLException e) {
+//                     e.printStackTrace();
+//                 }
+//             }
+//         }
+
+//     }
+
+//     public void returnRental(int customerId, int vehicleId) 
+//     {
     
-        public void rentVehicle(int customerId, int vehicleId)
-        {
-            if(!customerService.existById(customerId))
-            {
-                throw new IllegalArgumentException(" Customer Not Exist ");
-            }
+//             Connection connection = null;
 
-            if(!vehicleService.existById(vehicleId))
-            {
-                throw new IllegalArgumentException(" Vehicle Not Exist ");
-            }
+//         try 
+//         {
 
-            if(!vehicleService.isVehicleAvailable(vehicleId))
-            {
-                throw new IllegalArgumentException(" Vehicel Not Available ");
-            }
+//             DatabaseConnection databaseConnection = new DatabaseConnection();
 
-            LocalDate currentDate = LocalDate.now();
-            LocalDate returnDate = null;
+//             connection = databaseConnection.getConnection();
 
+//             connection.setAutoCommit(false);
 
-            Rental rental = new Rental(customerId, vehicleId, currentDate, returnDate);
+//             int rentalsRows = rentalRepository.returnRental(customerId, vehicleId, connection);
 
-           int rowsAffected = rentalRepository.saveRental(rental);
+//              if(rentalsRows != 1)
+//              {
+//                 connection.rollback();
+//                 throw new DataAccessException("No Rental Exist");
+//              }
 
-           if(rowsAffected > 0)
-           {
-                vehicleService.updateVehicleStatus(vehicleId, Vehicle.VehicleStatus.RENTED);
-           }
-
-        }
-
-      
-        public void returnRental(int customerId,int vehicleId)
-        {
-            int status = rentalRepository.returnRental(customerId,vehicleId);
-
-            if(status == 0)
-            {
-                throw new IllegalArgumentException(" No Rental Exist ");
-            }
-
-            vehicleService.updateVehicleStatus(vehicleId, Vehicle.VehicleStatus.AVAILABLE);
-        }
-}
+//            int vehicleRows = vehicleService.updateVehicleStatus(vehicleId, Vehicle.VehicleStatus.AVAILABLE, connection);
 
 
+          
+//            if( vehicleRows !=  1)
+//            {
+//                 connection.rollback();
+
+//                 throw new DataAccessException(" Failed to Update the return Date ");
+//            }
+
+//            connection.commit();
+     
+//         } 
+
+//         catch (SQLException | IOException e) 
+//         {
+//             if(connection != null)
+//             {
+//                 try 
+//                 {
+//                     connection.rollback();
+//                 } catch (SQLException rollBackException) 
+//                 {
+//                    e.addSuppressed(rollBackException);
+//                 }
+//                 throw new DataAccessException(" Failed to Update the return Date ");
+//             }
+//         }
+
+//         finally
+//         {
+//             try {
+//                 if(connection != null)
+//                 {
+//                     connection.close();
+//                 }
+//             } catch (SQLException e) 
+//             {
+//                 e.printStackTrace();    
+//             }
+//         }
+
+//     }
+// }
