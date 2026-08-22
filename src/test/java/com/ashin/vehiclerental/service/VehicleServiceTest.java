@@ -221,9 +221,9 @@ public class VehicleServiceTest {
 
         assertEquals(3, vehicles.size());
 
-            assertEquals("Toyota", vehicles.get(0).getType());
-            assertEquals("Toyota", vehicles.get(1).getType());
-            assertEquals("Toyota", vehicles.get(2).getType());
+            assertEquals("Toyota", vehicles.get(0).getBrand());
+            assertEquals("Toyota", vehicles.get(1).getBrand());
+            assertEquals("Toyota", vehicles.get(2).getBrand());
 
         verify(mockRepository).getAllVehicles();
     }
