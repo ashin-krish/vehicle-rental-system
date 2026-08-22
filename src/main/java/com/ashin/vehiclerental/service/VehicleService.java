@@ -2,7 +2,9 @@ package com.ashin.vehiclerental.service;
 import com.ashin.vehiclerental.repository.VehicleRepository;
 import com.ashin.vehiclerental.model.Vehicle;
 import java.sql.Connection;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class VehicleService {
@@ -66,6 +68,49 @@ public class VehicleService {
     public boolean existsByRegistrationNumber(String registerNumber)
     {
         return vehicleRepository.existsByRegistrationNumber(registerNumber);
+    }
+
+    public List<Vehicle> getAvailableVehicles()
+    {
+        List<Vehicle> vehicles = vehicleRepository.getAllVehicles();
+
+       List<Vehicle> availableVehicles = vehicles.stream()
+        .filter(vehicle -> vehicle.getVehicleStatus() == Vehicle.VehicleStatus.AVAILABLE)
+        .collect(Collectors.toList());
+
+        return availableVehicles;
+    }
+
+    public List<Vehicle> getVehicleByBrand(String brand)
+    {
+        List<Vehicle> vehicles = vehicleRepository.getAllVehicles();
+
+       List<Vehicle> availableVehicles = vehicles.stream()
+        .filter(vehicle -> vehicle.getBrand() == brand)
+        .collect(Collectors.toList());
+
+        return availableVehicles;
+    }
+    public List<Vehicle> getVehicleByType(String type)
+    {
+        List<Vehicle> vehicles = vehicleRepository.getAllVehicles();
+
+       List<Vehicle> availableVehicles = vehicles.stream()
+        .filter(vehicle -> vehicle.getType() == type)
+        .collect(Collectors.toList());
+
+        return availableVehicles;
+    }
+
+    public List<Vehicle> sortByPrice()
+    {
+        List<Vehicle> vehicles = vehicleRepository.getAllVehicles();
+
+       List<Vehicle> sortedVehicle = vehicles.stream()
+                                        .sorted(Comparator.comparing(Vehicle::getPricePerDay))
+                                        .collect(Collectors.toList());
+
+        return sortedVehicle;   
     }
 
 }    

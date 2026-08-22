@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import com.ashin.vehiclerental.exception.DataAccessException;
 import com.ashin.vehiclerental.model.Rental;
@@ -154,4 +156,21 @@ public class RentalService
         }
 
     }
+
+
+    public List<Rental> getAllRentals()
+    {
+        return rentalRepository.getAllRentals();
+    }
+
+    public List<Rental> getActiveRentals()
+    {
+        List<Rental> allRentals = getAllRentals();
+
+        List<Rental> activeRentals = allRentals.stream()
+                                    .filter(rental -> rental.getReturnDate() == null)
+                                    .collect(Collectors.toList());
+        return activeRentals;
+    }
+
 }

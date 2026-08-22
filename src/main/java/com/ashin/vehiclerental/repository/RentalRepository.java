@@ -2,10 +2,13 @@ package com.ashin.vehiclerental.repository;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.ashin.vehiclerental.exception.DataAccessException;
 import com.ashin.vehiclerental.model.Rental;
@@ -130,6 +133,57 @@ public class RentalRepository {
         } catch (SQLException e) {
             throw new DataAccessException(
                     "Failed to Save The Rental", e);
+        }
+    }
+
+
+    public List<Rental> getAllRentals()
+    {
+
+        List<Rental> rentals = new ArrayList<>();
+
+        String getRentalQuery = " SELECT * FROM rentals ";
+
+        try 
+        {
+            DatabaseConnection databaseConnection = new DatabaseConnection();
+
+            try (Connection connection = databaseConnection.getConnection();
+                    PreparedStatement preparedStatement = connection.prepareStatement(getRentalQuery);
+                        ResultSet resultSet = preparedStatement.executeQuery()) 
+            {
+                    while (resultSet.next()) 
+                    {
+                            int id = resultSet.getInt("id");
+                            int CustomerId = resultSet.getInt("customer_id");
+                            int VehicleId = resultSet.getInt("vehicle_id");
+                            Date rentalDate = resultSet.getDate("rental_date");
+                            Date returnDate = resultSet.getDate("return_date");
+
+                           LocalDate rentalLocalDate = rentalDate.toLocalDate();
+                           
+                           LocalDate returnLocalDate = null;
+
+                            if(returnDate != null)
+                            {
+                                 returnLocalDate = returnDate.toLocalDate();
+                            }
+
+                            Rental rental = new Rental(id, CustomerId, VehicleId, rentalLocalDate, returnLocalDate);
+
+                            rentals.add(rental);
+
+                             
+                    }
+
+                
+            } 
+            return rentals;
+         
+         } 
+        catch (SQLException | IOException e) 
+        {
+           throw new DataAccessException(" Failed Load The Existing Rental",e);
         }
     }
 
